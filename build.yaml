@@ -4,4 +4,5 @@ include:
     snippet: studio-rpc-usb-uart
   - board: xiao_ble
     shield: totem_right
-# there is no settingsreset (needed) for the XIAO
+  - board: xiao_ble
+    shield: settings_reset
