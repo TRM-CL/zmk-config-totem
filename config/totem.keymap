@@ -30,7 +30,14 @@
 };
 
 / {
-    combos { compatible = "zmk,combos"; };
+    combos {
+        compatible = "zmk,combos";
+
+        game {
+            bindings = <&to 6>;
+            key-positions = <13 16 12 17>;
+        };
+    };
 
     macros {
         gif: gif {
@@ -205,6 +212,15 @@
         &trans       &kp LS(LEFT)  &kp LC(F17)   &kp LS(RIGHT)  &kp RET        &trans  &kp F4  &kp F5  &kp F6  &kp F11
 &trans  &kp J        &kp LS(C)     &kp LC(F16)   &kp LS(V)      &kp LC(F15)    &trans  &kp F1  &kp F2  &kp F3  &kp F10  &trans
                                    &trans        &kp LC(F12)    &kp LC(F11)    &trans  &trans  &trans
+            >;
+        };
+
+        in-falsus {
+            bindings = <
+         &trans  &trans  &trans          &trans          &trans            &trans     &trans     &trans     &trans  &trans
+         &trans  &trans  &kp A           &kp S           &trans            &trans     &kp D      &kp F      &trans  &trans
+&kp ESC  &trans  &trans  &trans          &trans          &trans            &trans     &trans     &trans     &trans  &trans  &to 0
+                         &kp LEFT_SHIFT  &kp LEFT_SHIFT  &kp LEFT_SHIFT    &kp SPACE  &kp SPACE  &kp SPACE
             >;
         };
     };
