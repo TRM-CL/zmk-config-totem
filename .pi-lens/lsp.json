@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "dts-lsp": {
+      "name": "Device Tree Language Server",
+      "extensions": [".keymap", ".overlay", ".dtsi", ".dts"],
+      "command": "dts-lsp",
+      "args": [],
+      "rootMarkers": ["config/west.yml", "build.yaml"]
+    }
+  }
+}
