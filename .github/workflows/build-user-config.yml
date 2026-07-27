@@ -1,9 +1,12 @@
 # Reusable user config build.
-# Vendored from zmkfirmware/zmk@v0.3 (.github/workflows/build-user-config.yml)
-# with the only change being: all GitHub Actions bumped from v4 -> v5 so they
-# run on the Node.js 24 runtime (v4 runs on Node 20, which GitHub is
-# deprecating on hosted runners). Keep this in sync with upstream when
-# upgrading the ZMK pin in config/west.yml.
+# Vendored from zmkfirmware/zmk@v0.3 (.github/workflows/build-user-config.yml),
+# with the GitHub Actions bumped onto the Node.js 24 runtime so the runs no
+# longer trip GitHub's "Node.js 20 is deprecated" warning:
+#   actions/checkout@v4 -> v5          (v5 runs on Node 24)
+#   actions/cache@v4    -> v5          (v5 runs on Node 24)
+#   actions/upload-artifact@v4 -> v7   (v5 still defaults to Node 20; v6+ is Node 24)
+#   actions/upload-artifact/merge@v4 -> v7
+# Keep this in sync with upstream when upgrading the ZMK pin in config/west.yml.
 
 name: Reusable user config build
 
@@ -168,7 +171,7 @@ jobs:
           fi
 
       - name: Archive (${{ env.display_name }})
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: artifact-${{ env.artifact_name }}
           path: ${{ env.build_dir }}/artifacts
@@ -179,7 +182,7 @@ jobs:
     name: Merge Output Artifacts
     steps:
       - name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v5
+        uses: actions/upload-artifact/merge@v7
         with:
           name: ${{ inputs.archive_name }}
           pattern: artifact-*
