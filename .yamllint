@@ -1,0 +1,14 @@
+# yamllint configuration.
+# GitHub Actions workflows and west/build config YAML intentionally:
+#   - omit the "---" document starter,
+#   - use "on:" as the workflow trigger key (flagged by the truthy rule under
+#     YAML 1.1, where on/off are booleans),
+#   - embed ${{ ... }} expressions and shell one-liners that exceed 80 columns.
+# Those three rules are relaxed; everything else stays at defaults.
+extends: default
+
+rules:
+  line-length: disable
+  document-start: disable
+  truthy:
+    check-keys: false

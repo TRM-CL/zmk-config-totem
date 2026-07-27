@@ -1,5 +1,15 @@
+name: Build
+
 on: [push, pull_request, workflow_dispatch]
+
+# Minimal token scope: this workflow only checks out the repo and uploads
+# build artifacts; it never pushes, releases, or comments.
+permissions:
+  contents: read
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+    # Use the locally vendored workflow (actions on Node.js 24 runtime)
+    # instead of zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+    # (which still pins actions/checkout@v4 etc. on the deprecated Node 20).
+    uses: ./.github/workflows/build-user-config.yml

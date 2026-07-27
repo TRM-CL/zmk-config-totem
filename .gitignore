@@ -1,0 +1,6 @@
+# nix / direnv shell
+.direnv/
+
+# pi-lens local cache & session data
+# (the project config .pi-lens.json IS tracked; this ignores only the cache dir)
+.pi-lens/
