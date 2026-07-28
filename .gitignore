@@ -4,3 +4,4 @@
 # pi-lens local cache & session data
 # (the project config .pi-lens.json IS tracked; this ignores only the cache dir)
 .pi-lens/
+firmware/  # CI 下载的刷机产物,可再生,不入库
