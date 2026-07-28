@@ -1,0 +1,14 @@
+[Unit]
+Description=Totem ZMK live-layer BLE listener (Peahen Calling)
+# 扫描 Totem 左半的不可连接状态广播,写 ~/.local/share/totem-keymap/active-layer
+# python+bleak 环境:nix profile install --impure --expr \
+#   '(builtins.getFlake "nixpkgs").legacyPackages.x86_64-linux.python3.withPackages (ps:[ps.bleak])'
+After=bluetooth.target
+
+[Service]
+ExecStart=%h/.nix-profile/bin/python3 %h/.local/share/totem-keymap/totem-layer-listener.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target
