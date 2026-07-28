@@ -211,3 +211,29 @@ blueman-applet 当 agent 能用,但它的 `StatusIcon` 插件会拉起 `blueman-
 
 - `profiles/hardware/bluetooth.nix` — `bluez-tools` + bt-agent 说明
 - `hosts/forge-os/home.nix` — `bt-agent` systemd user service
+
+---
+
+## 场景 2:刷固件后「连得上但打字没反应」
+
+**症状**:BlueZ 显示 Connected/Bonded,键盘自身广播正常(层/电量遥测都在走),
+但主机没有输入设备(`libinput list-devices` 查不到键盘),打字零响应。
+
+**根因**:新固件改了 GATT 表(本次:开 `CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY`
+新增 BAS 服务),BlueZ 的已配对 service cache 失效,HID hog 注册不上。
+`disconnect`/`connect` 重连**不能**修。
+
+**修法(双向清 bond 重配)**:
+
+1. 主机:`bluetoothctl remove <MAC>`
+2. 键盘:ADJ 层按 `BT_CLR`(清当前 profile 的键盘侧 bond)
+3. 重新配对(参照场景 1 的验证清单)
+
+**预防**:凡是改了 GATT 服务集的 Kconfig(BAS/HID/自定义 service),刷机后直接走一遍重配,
+不用等用户发现。
+
+## 场景 3:Kconfig 改动疑似没生效 → 用 CI 产物 md5 实锤
+
+`menuconfig`/`if` 块 gate 住的符号(如 `ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY`
+被 `..._FETCHING` gate),只写子符号 = 静默空操作,构建不报错。
+验证法:下载相邻两次 CI 的 uf2 比 md5——**md5 相同 = 配置没进构建**,去查父开关。
