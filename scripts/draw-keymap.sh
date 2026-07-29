@@ -38,7 +38,7 @@ d['draw_config'] = {
     'outer_pad_h': 6,   # canvas margin (default 56 = key_h)
     'key_rx': 8,
     'key_ry': 8,
-    'svg_extra_style': 'svg.keymap { font-size: 15px; } text.key { font-weight: 600; }',
+    'svg_extra_style': 'svg.keymap { font-size: 15px; } text.key { font-weight: 600; } text.hold, text.shifted, text.combo, text.left, text.right, text.tl, text.tr, text.bl, text.br { font-size: 10px; font-weight: 500; }',
 }
 open(path, 'w').write(yaml.dump(d, default_flow_style=False, sort_keys=False))
 EOF

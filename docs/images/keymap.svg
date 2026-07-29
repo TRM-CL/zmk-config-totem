@@ -124,7 +124,7 @@ path.combo {
 }
 /* End Tabler Icons Cleanup */
 
-svg.keymap { font-size: 15px; } text.key { font-weight: 600; }</style>
+svg.keymap { font-size: 15px; } text.key { font-weight: 600; } text.hold, text.shifted, text.combo, text.left, text.right, text.tl, text.tr, text.bl, text.br { font-size: 10px; font-weight: 500; }</style>
 <g transform="translate(6, 0)" class="layer-BASE">
 <text x="0" y="3" class="label" id="BASE">BASE:</text>
 <g transform="translate(0, 6)">
