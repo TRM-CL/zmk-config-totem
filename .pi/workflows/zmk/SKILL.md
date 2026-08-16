@@ -42,6 +42,7 @@ USB 能打字吗?
 > ZMK 官方原话:"You will not be able to pair your keyboard or see it in any Bluetooth device lists **until you have flashed the normal firmware again**."
 
 **正确流程(4 次刷写)**:
+
 1. 左半边 → `settings_reset-...uf2`(清空)
 2. 右半边 → `settings_reset-...uf2`(清空)
 3. 左半边 → `totem_left-...uf2`(**刷回正常固件,这步最容易漏**)
@@ -56,6 +57,7 @@ USB 能打字吗?
 ### 改两个文件(临时)
 
 `config/boards/shields/totem/totem_left.conf`(原本是空文件):
+
 ```conf
 CONFIG_ZMK_USB_LOGGING=y
 CONFIG_LOG_DEFAULT_LEVEL=3
@@ -63,6 +65,7 @@ CONFIG_ZMK_STUDIO=n   # 临时关 Studio,避开两个 CDC snippet 共存冲突(z
 ```
 
 `build.yaml`(左半边 snippet 临时换掉):
+
 ```yaml
   - board: seeeduino_xiao_ble
     shield: totem_left
@@ -116,6 +119,7 @@ BlueZ 5.x 在很多发行版默认 `Pairable: no`,根本不接受新配对。键
 主机 SMP 直接回 reason 0xc。这跟键盘存的旧 bond 无关,所以刷 settings_reset 没用。
 
 **修复**:
+
 ```bash
 bluetoothctl pairable on
 ```
@@ -124,6 +128,7 @@ bluetoothctl pairable on
 
 **症状**:开了 Pairable 后「连上一下就断开」。
 **主机端确认**:`journalctl -u bluetooth` 刷 `No agent available for request type 2`
+
 + `device_confirm_passkey: Operation not permitted`。
 
 BlueZ 配对到需要确认 passkey 那一步(`request type 2` = CONFIRM_PASSKEY),必须有
@@ -131,6 +136,7 @@ BlueZ 配对到需要确认 passkey 那一步(`request type 2` = CONFIRM_PASSKEY
 桌面环境通常由 GNOME/KDE 蓝牙组件提供 agent;niri + Caelestia 这类自组 WM 没有。
 
 **临时修复**(CLI 当 agent):
+
 ```bash
 bluetoothctl
 [bluetoothctl] agent on
@@ -145,6 +151,7 @@ bluetoothctl
 用 `bluez-tools` 的 `bt-agent`(无 UI 纯 agent)当常驻 systemd user service:
 
 `profiles/hardware/bluetooth.nix`:
+
 ```nix
 { pkgs, ... }:
 {
@@ -154,6 +161,7 @@ bluetoothctl
 ```
 
 `hosts/<host>/home.nix`:
+
 ```nix
 systemd.user.services.bt-agent = {
   Unit = {
@@ -184,11 +192,11 @@ blueman-applet 当 agent 能用,但它的 `StatusIcon` 插件会拉起 `blueman-
 
 ## 验证清单
 
-- [ ] `bluetoothctl show` → `Pairable: yes`
-- [ ] `bluetoothctl info <键盘MAC>` → `Paired/Bonded/Trusted/Connected: yes`
-- [ ] `journalctl -u bluetooth` → 无 `No agent available`
-- [ ] 拔掉 USB,蓝牙能打字
-- [ ] 侧边栏只有一个蓝牙图标(Caelestia 原生)
++ [ ] `bluetoothctl show` → `Pairable: yes`
++ [ ] `bluetoothctl info <键盘MAC>` → `Paired/Bonded/Trusted/Connected: yes`
++ [ ] `journalctl -u bluetooth` → 无 `No agent available`
++ [ ] 拔掉 USB,蓝牙能打字
++ [ ] 侧边栏只有一个蓝牙图标(Caelestia 原生)
 
 ## 时间线参考(本次实际排查)
 
@@ -202,15 +210,15 @@ blueman-applet 当 agent 能用,但它的 `StatusIcon` 插件会拉起 `blueman-
 
 ## 相关文件(本仓)
 
-- `config/west.yml` — ZMK 版本钉在 `v0.3`(注:`v0.3` 与 `v0.3.0` 是同一 commit)
-- `build.yaml` — 构建矩阵,含 `settings_reset` shield
-- `config/boards/shields/totem/totem.keymap` — ADJ 层有 BT_CLR/BT_NXT/BT_PRV/OUT_TOG
-- `config/totem.conf` — `CONFIG_ZMK_USB_LOGGING=n`(诊断时临时改 left.conf 覆盖)
++ `config/west.yml` — ZMK 版本钉在 `v0.3`(注:`v0.3` 与 `v0.3.0` 是同一 commit)
++ `build.yaml` — 构建矩阵,含 `settings_reset` shield
++ `config/boards/shields/totem/totem.keymap` — ADJ 层有 BT_CLR/BT_NXT/BT_PRV/OUT_TOG
++ `config/totem.conf` — `CONFIG_ZMK_USB_LOGGING=n`(诊断时临时改 left.conf 覆盖)
 
 ## 相关文件(nixos-config 仓)
 
-- `profiles/hardware/bluetooth.nix` — `bluez-tools` + bt-agent 说明
-- `hosts/forge-os/home.nix` — `bt-agent` systemd user service
++ `profiles/hardware/bluetooth.nix` — `bluez-tools` + bt-agent 说明
++ `hosts/forge-os/home.nix` — `bt-agent` systemd user service
 
 ---
 
@@ -237,3 +245,44 @@ blueman-applet 当 agent 能用,但它的 `StatusIcon` 插件会拉起 `blueman-
 `menuconfig`/`if` 块 gate 住的符号(如 `ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY`
 被 `..._FETCHING` gate),只写子符号 = 静默空操作,构建不报错。
 验证法:下载相邻两次 CI 的 uf2 比 md5——**md5 相同 = 配置没进构建**,去查父开关。
+
+## 场景 4:电量显示十分有九分不准(显示偏高+没电早)→ 串口 mV 曲线定案
+
+2026-08 实战:Totem 左半「插着线充一会灯就灭」,仪表盘长期 92%,实际用半小时就断电。
+
+### 先记住硬件事实(XIAO BLE / Totem)
++ ZMK 电量 = 电压估讧:`lithium_ion_mv_to_pct()` 一条直线(3450→1%,4200→100%),
+  **插线充电时任何 % 都是假的**(充电电流抬压可虚高 +50 点)
++ 充电时采样后 % 会缓存广播;空闲 30s 停采后缓存值永久外发 → 「92%」其实是充电瞬间的假象
++ **板载电源开关 OFF 时电池回路断开,插线不充电**——充电时必须拨到 ON(本次真正的病根)
+
+### 诊断链(全零操作采集,不需要用户打字)
+
+1. **固件**(分支 `diagnostic/battery`,可直接复用):左半 snippet 换 `zmk-usb-logging`,
+   `totem_left.conf` 加 `CONFIG_ZMK_USB_LOGGING=y` + `CONFIG_ZMK_STUDIO=n`(CDC 冲突 zmk#3031)
+   + `CONFIG_ZMK_IDLE_TIMEOUT=86400000`(否则空闲 30s 停采)+ `CONFIG_ZMK_BATTERY_REPORT_INTERVAL=30`
+   ⚠️ 不要写 `CONFIG_ZMK_LOG_LEVEL`——无 prompt 符号,Kconfig 直接拒构建(默认已是 4)
+2. **刷机**:值守脚本盯 XIAO-SENSE 盘出现即 cp uf2(用户只需双击 reset,无时机要求)
+3. **串口捕获**:⚠️ 两个坑——/dev/ttyACM* 权限(重枚举后 chmod 失效,以 root 跑);
+   **Zephyr CDC 需要主机拉 DTR 才持续 TX**,否则一次 USB 事件后静默断流(v1 捕获器死于此时)
+4. **读数**:串口里找 `bvd_sample_fetch: ADC raw N ~ X mV => Y mV; Percent: P`
+   ——Y 才是电池真实电压,% 是 ZMK 直线换算结果。另配广播时间线(batt-recorder.py 记 status.json)
+
+### 曲线判读(实测样本)
+
+| 形态 | 判定 |
+|---|---|
+| 平滑爬升(+50mV/h↑)→ 4.14V 平台 → 单次终止灯灭 | ✅ 充电正常(95min/40%→满,100mAh 预期) |
+| ON=4142 / OFF=3740 方波振荡(85 次/h),静息零漂移 | ❌ 电池不在回路:充电器空载打摆。**先查开关/JST 触点**,再怀疑电池内阻 |
+| 插线时 % 虚高 50 点,拔线静息掉回真实值 | 正常现象(充电抬压),插线读数一律忽略 |
+| 拔线静息 ~84-86%(非 100%) | 正常:真·满电静息 ~4.15V,ZMK 直线算出 84%。保守无害,不修 |
+
+### 增益标定(可选,本次结论:不用)
+
+CV 平台读数/4200 = k。实测 k=0.981(±2% 内)→ 不动 overlay;超 ±2% 才用
+shield overlay 覆写 `output-ohms`/`full-ohms` 修正。
+
+### 教训
++ 「电池坏了」判决前,先排除**开关断路**——它产生的内阻假象和真老化在数据上难分(本次差点误诊)
++ 诊断期长插线场景必须拉长 `ZMK_IDLE_TIMEOUT`,否则采不到样;插着 USB 时 activity.c
+  不会触发系统关机(需 `!is_usb_power_present()`),深睡行为不变
