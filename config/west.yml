@@ -7,12 +7,8 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: v0.3
+      revision: main   # DIAGNOSTIC: v0.3(最新稳定)USB 断连路径疑似硬崩;main=Zephyr 4.x 全新 UDC 栈
       import: app/west.yml
-    - name: peahen-calling
-      remote: ziembski
-      repo-path: Peahen-Calling-for-ZMK
-      revision: main
-      path: modules/peahen-calling
+    # DIAGNOSTIC: peahen 模块临时移除(锁 v0.3 时代,main 兼容性未知,减少变量)
   self:
     path: config
