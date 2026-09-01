@@ -1,9 +1,9 @@
 include:
-  - board: seeed_xiao_ble
+  - board: xiao_ble//zmk
     shield: totem_left
     # 诊断临时:无 snippet = 无任何 USB CDC 接口,验证 CDC 断开路径崩溃假说。
     # 平时用 studio-rpc-usb-uart。
-  - board: seeed_xiao_ble
+  - board: xiao_ble//zmk
     shield: totem_right
-  - board: seeed_xiao_ble
+  - board: xiao_ble//zmk
     shield: settings_reset
