@@ -1,9 +1,12 @@
 include:
   - board: xiao_ble//zmk
     shield: totem_left
-    # 诊断临时:无 snippet = 无任何 USB CDC 接口,验证 CDC 断开路径崩溃假说。
-    # 平时用 studio-rpc-usb-uart。
+    artifact-name: totem_left
+    # 诊断:zmk-usb-logging 引出串口日志观察新栈断连路径
+    snippet: zmk-usb-logging
   - board: xiao_ble//zmk
     shield: totem_right
+    artifact-name: totem_right
   - board: xiao_ble//zmk
     shield: settings_reset
+    artifact-name: settings_reset
