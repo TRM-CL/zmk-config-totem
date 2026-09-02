@@ -1,0 +1,4 @@
+name: totem-diagnostics
+build:
+  cmake: .
+  kconfig: Kconfig

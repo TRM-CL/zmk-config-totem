@@ -1,0 +1,19 @@
+config TOTEM_LIGHTHOUSE
+	bool "Boot-stage LED lighthouse for power diagnostics"
+	default n
+	help
+	  Power-crisis microscope for the XIAO BLE. Blinks the onboard user
+	  blue LED (P0.06) at boot stages so board state is observable with
+	  zero USB:
+	    2 fast blinks = POST_KERNEL reached
+	    5 fast blinks = APPLICATION init reached
+	    slow heartbeat = main loop alive
+	  On battery-only boot / USB unplug, the pattern shown (or silence)
+	  discriminates: never-executes (power path), reboot-loop (reset
+	  storm), or alive-but-radio-dead (chip-level clock gating).
+
+config TOTEM_LIGHTHOUSE_HEARTBEAT_MS
+	int "Heartbeat blink period in milliseconds"
+	range 200 10000
+	default 2000
+	depends on TOTEM_LIGHTHOUSE
